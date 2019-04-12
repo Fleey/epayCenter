@@ -43,8 +43,8 @@ class XaPayV1Model
             'notify_url'   => $notifyUrl,
             'nonce_str'    => getRandChar(16)
         ];
-        if (!empty($callBackUrl))
-            $param['callback_url'] = $callBackUrl;
+//        if (!empty($callBackUrl))
+//            $param['callback_url'] = $callBackUrl;
 
         $param['sign'] = $this->buildSignMD5($param);
         $requestResult = curl($this->gateway . '/kakaloan/quick/cashierOrder', [], 'post', $param, '', false);
