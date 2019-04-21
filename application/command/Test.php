@@ -3,6 +3,7 @@
 namespace app\command;
 
 use app\api\model\OwPayV1Model;
+use app\api\model\XdPayV1Model;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
@@ -11,6 +12,7 @@ class Test extends Command
 {
     public $a = 66;
     public $c = 777;
+
     protected function configure()
     {
         // 指令配置
@@ -20,12 +22,12 @@ class Test extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $owPayModel  = new OwPayV1Model();
-        $requestData = $owPayModel->getPayUrl('AliH5',
-            17, number_format(100 / 100, 2),
-            env('DEFAULT_PRODUCT_NAME'),
-            url('/Pay/Ow/Notify', '', false, true),
-            url('/Pay/Ow/Return', '', false, true));
+        $owPayModel = new XdPayV1Model();
+//        $requestData = $owPayModel->getPayUrlAliH5('1',
+//            100,
+//            url('/Pay/Xd/Notify', '', false, true),
+//            url('/Pay/Xd/Return', '', false, true));
+        $requestData = $owPayModel->isPay('1', '100');
         //支付宝支付
         dump($requestData);
         // 指令输出

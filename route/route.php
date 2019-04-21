@@ -16,4 +16,5 @@ Route::group('Pay', function () {
     Route::controller('Yb', 'pay/YbApiV1');
     Route::controller('Xa', 'pay/XaApiV1');
     Route::controller('Ow', 'pay/OwApiV1');
+    Route::controller('Xd', 'pay/XdApiV1');
 });

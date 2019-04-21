@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\api\model\OwPayV1Model;
 use app\api\model\XaPayV1Model;
+use app\api\model\XdPayV1Model;
 use think\App;
 use think\Controller;
 use think\Db;
@@ -113,8 +114,10 @@ class ApiV1 extends Controller
         $payAisle = 0;
         if ($payType == 4) {
             $payAisle = 2;
-        } else if ($payType == 1 || $payType == 3) {
+        } else if ($payType == 1) {
             $payAisle = 3;
+        } else if ($payType == 3) {
+            $payAisle = 4;
         }
 
         $result = Db::name('order')->insertGetId([
@@ -151,12 +154,8 @@ class ApiV1 extends Controller
         } else if ($payType == 3) {
             if ($money < 100)
                 $this->returnJson(['status' => -1, 'msg' => '[EpayCenter] 最低金额不能小于1RMB' . $money]);
-            $owPayModel  = new OwPayV1Model();
-            $requestData = $owPayModel->getPayUrl('AliH5',
-                $result, number_format($money / 100, 2),
-                env('DEFAULT_PRODUCT_NAME'),
-                url('/Pay/Ow/Notify', '', false, true),
-                url('/Pay/Ow/Return', '', false, true));
+            $xdPayModel  = new XdPayV1Model();
+            $requestData = $xdPayModel->getPayUrlAliH5($result, $money, url('/Pay/Xd/Notify', '', false, true), url('/Pay/Xd/Return', '', false, true));
             //支付宝支付
         } else {
             $this->returnJson(['status' => -1, 'msg' => '[EpayCenter] 暂无更多的支付方式']);
