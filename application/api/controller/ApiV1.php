@@ -18,8 +18,6 @@ class ApiV1 extends Controller
     public function __construct(App $app = null)
     {
         parent::__construct($app);
-        if ($this->request->url() == '/doc/v2')
-            return;
         $this->requestData = input('post.');
         if (empty($this->requestData))
             $this->returnJson(['status' => 0, 'msg' => '请求数据不能为空，仅支持POST方式传递参数']);
