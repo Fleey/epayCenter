@@ -2,10 +2,7 @@
 
 namespace app\api\controller;
 
-use app\api\model\OwPayV1Model;
 use app\api\model\PayModel;
-use app\api\model\XaPayV1Model;
-use app\api\model\XdPayV1Model;
 use think\App;
 use think\Controller;
 use think\Db;
