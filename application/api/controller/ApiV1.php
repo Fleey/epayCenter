@@ -23,6 +23,10 @@ class ApiV1 extends Controller
             $this->returnJson(['status' => 0, 'msg' => '商户号不能为空']);
         if (empty($this->requestData['sign_type']))
             $this->returnJson(['status' => 0, 'msg' => '[10001]签名效验失败，仅支持MD5签名']);
+        if (empty($this->requestData['time']))
+            $this->returnJson(['status' => 0, 'msg' => '[10005]签名校验失败,时间参数不能为空']);
+        if ((time() - intval($this->requestData['time'])) > 120)
+            $this->returnJson(['status' => 0, 'msg' => '[10006]签名校验失败,时间超时 或者 将时区调整为 Asia/Shanghai']);
         if ($this->requestData['sign_type'] != 'MD5')
             $this->returnJson(['status' => 0, 'msg' => '[10002]签名效验失败，仅支持MD5签名']);
         $userKey = Db::name('user')->where('id', $this->requestData['uid'])->field('key')->limit(1)->select();
@@ -42,7 +46,12 @@ class ApiV1 extends Controller
      */
     public function postPayApiList()
     {
-        $payType = input('post.type');
+        if (!isset($this->requestData['type']))
+            $this->returnJson([
+                'status' => 0,
+                'msg'    => '支付类型不能为空'
+            ]);
+        $payType = $this->requestData['type'] - 1;
 
         $this->returnJson([
             'status' => 1,
@@ -101,9 +110,16 @@ class ApiV1 extends Controller
         $notifyUrl = $this->requestData['notifyUrl'];
         $returnUrl = $this->requestData['returnUrl'];
 
+        if (empty($this->requestData['payAisle']))
+            $this->requestData['payAisle'] = 0;
+
+        $payAisle = intval($this->requestData['payAisle']);
+
         $payType = self::converPayName($payType);
         if (!$payType)
             $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型有误']);
+        if (empty($payAisle))
+            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付接口不能为空']);
         $money = decimalsToInt($money, 2);
         if ($money <= 0)
             $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 请求金额异常']);
@@ -116,19 +132,14 @@ class ApiV1 extends Controller
             if ($result[0]['status'])
                 $this->returnJson(['status' => 2, 'msg' => '[EpayCenter] 订单已经付款,无法再次支付']);
 
+
+        if (!PayModel::isExistPayApi($payType, $payAisle))
+            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型接口有误,请联系管理员处理']);
         Db::name('order')->where([
             'tradeNoOut' => $tradeNo,
             'uid'        => $this->uid
         ])->limit(1)->delete();
 
-        $payAisle = 0;
-        if ($payType == 4) {
-            $payAisle = 2;
-        } else if ($payType == 1) {
-            $payAisle = 3;
-        } else if ($payType == 3) {
-            $payAisle = 3;
-        }
 
         $result = Db::name('order')->insertGetId([
             'uid'        => $this->uid,

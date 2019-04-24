@@ -101,6 +101,10 @@ class PayModel
         } else if ($payAisle == 4) {
             $xdPayModel = new XdPayV1Model();
             if ($payType == 3) {
+                if (intval($money < 100)) {
+                    $requestResult['msg'] = '[XD] 订单金额不能低于 100 RMB';
+                    return $requestResult;
+                }
                 $requestResult = $xdPayModel->getPayUrlAliH5($tradeNo, $money * 100,
                     url('/Pay/Xd/Notify', '', false, true),
                     url('/Pay/Xd/Return', '', false, true));
