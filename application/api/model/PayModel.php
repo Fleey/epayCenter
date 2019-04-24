@@ -45,6 +45,7 @@ class PayModel
      */
     public static function isExistPayApi(int $payType, int $payAisle)
     {
+        $payType = $payType - 1;
         if (empty(self::$apiList[$payType]))
             return false;
         foreach (self::$apiList[$payType] as $data) {
@@ -65,8 +66,8 @@ class PayModel
      */
     public static function buildPayData(string $tradeNo, string $money, int $payType, int $payAisle, string $productName = '')
     {
-        if (self::isExistPayApi($payType, $payAisle))
-            return ['isSuccess' => false, 'msg' => '[EpayCenter] 支付类型接口不存在'];
+        if (!self::isExistPayApi($payType, $payAisle))
+            return ['isSuccess' => false, 'msg' => '支付类型接口不存在'];
 
         if (empty($productName))
             $productName = env('DEFAULT_PRODUCT_NAME');

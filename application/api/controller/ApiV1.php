@@ -41,6 +41,15 @@ class ApiV1 extends Controller
         $this->userKey     = $userKey;
     }
 
+    public function postPayApiListAll()
+    {
+        $this->returnJson([
+            'status' => 1,
+            'msg'    => '查询接口列表成功',
+            'data'   => json_encode(PayModel::$apiList)
+        ]);
+    }
+
     /**
      * 获取接口列表
      */
@@ -132,9 +141,8 @@ class ApiV1 extends Controller
             if ($result[0]['status'])
                 $this->returnJson(['status' => 2, 'msg' => '[EpayCenter] 订单已经付款,无法再次支付']);
 
-
         if (!PayModel::isExistPayApi($payType, $payAisle))
-            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型接口有误,请联系管理员处理']);
+            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 2支付类型接口有误,请联系管理员处理']);
         Db::name('order')->where([
             'tradeNoOut' => $tradeNo,
             'uid'        => $this->uid
