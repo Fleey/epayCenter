@@ -3,6 +3,7 @@
 namespace app\api\controller;
 
 use app\api\model\OwPayV1Model;
+use app\api\model\PayModel;
 use app\api\model\XaPayV1Model;
 use app\api\model\XdPayV1Model;
 use think\App;
@@ -37,6 +38,20 @@ class ApiV1 extends Controller
         $this->uid         = $this->requestData['uid'];
         $this->requestData = json_decode(urldecode($this->requestData['data']), true);
         $this->userKey     = $userKey;
+    }
+
+    /**
+     * 获取接口列表
+     */
+    public function postPayApiList()
+    {
+        $payType = input('post.type');
+
+        $this->returnJson([
+            'status' => 1,
+            'msg'    => '查询接口列表成功',
+            'data'   => json_encode(empty(PayModel::$apiList[$payType]) ? [] : PayModel::$apiList[$payType])
+        ]);
     }
 
     /**
@@ -115,7 +130,7 @@ class ApiV1 extends Controller
         } else if ($payType == 1) {
             $payAisle = 3;
         } else if ($payType == 3) {
-            $payAisle = 4;
+            $payAisle = 3;
         }
 
         $result = Db::name('order')->insertGetId([
@@ -132,36 +147,7 @@ class ApiV1 extends Controller
         if (!$result)
             $this->returnJson(['status' => -1, 'msg' => '[EpayCenter]数据库新增数据异常，请刷新重试。']);
 
-        if ($payType == 4) {
-            $xaPayModel  = new XaPayV1Model();
-            $requestData = $xaPayModel->getPayUrl($result,
-                number_format($money / 100, 2),
-                env('DEFAULT_PRODUCT_NAME'),
-                url('/Pay/Xa/Notify', '', false, true),
-                url('/Pay/Xa/Return', '', false, true)
-            );
-            //银联支付
-        } else if ($payType == 1) {
-            $owPayModel  = new OwPayV1Model();
-            $requestData = $owPayModel->getPayUrl('WxH5',
-                $result, number_format($money / 100, 2),
-                env('DEFAULT_PRODUCT_NAME'),
-                url('/Pay/Ow/Notify', '', false, true),
-                url('/Pay/Ow/Return', '', false, true));
-            //微信支付
-        } else if ($payType == 3) {
-            if ($money < 100)
-                $this->returnJson(['status' => -1, 'msg' => '[EpayCenter] 最低金额不能小于1RMB' . $money]);
-            $xdPayModel  = new XdPayV1Model();
-            $requestData = $xdPayModel->getPayUrlAliH5($result, $money, url('/Pay/Xd/Notify', '', false, true), url('/Pay/Xd/Return', '', false, true));
-            //支付宝支付
-        } else {
-            $this->returnJson(['status' => -1, 'msg' => '[EpayCenter] 暂无更多的支付方式']);
-        }
-//        else {
-//            $ybPayModel  = new YbPayV1Model();
-//            $requestData = $ybPayModel->getQrCode($result, number_format($money / 100, 2));
-//        }
+        $requestData = PayModel::buildPayData($tradeNo, number_format($money / 100, 2), $payType, $payAisle);
         //核心业务
 
         if (!$requestData['isSuccess']) {

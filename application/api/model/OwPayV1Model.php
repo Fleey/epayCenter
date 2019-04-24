@@ -43,7 +43,7 @@ class OwPayV1Model
         $payTypeID = 0;
         $appID     = 'appID' . $payType;
         if (empty($this->$appID))
-            throw new Exception('[OwPayV1Model] 参数为空或异常,请注意！！！');
+            return ['isSuccess' => false, 'msg' => '[OwPayV1Model] 参数为空或异常,请注意！！！'];
 
         switch ($payType) {
             case 'AliH5':

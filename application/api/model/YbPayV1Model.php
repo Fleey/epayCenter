@@ -26,11 +26,11 @@ class YbPayV1Model
      * @param string $money
      * @return string|null
      */
-    public function getQrCode(string $tradeNo, string $money)
+    public function getPayUrl(string $tradeNo, string $money)
     {
         if (empty($tradeNo) || empty($money))
             return null;
-        $url           = $this->gateway . 'api/index/qrcode';
+        $url           = $this->gateway . 'api/index/order_url';
         $requestResult = $this->requestApi($url, ['order_num' => $tradeNo, 'money' => $money]);
         if ($requestResult === false)
             return null;
