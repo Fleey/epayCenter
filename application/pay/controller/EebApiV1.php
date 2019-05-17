@@ -67,6 +67,17 @@ class EebApiV1 extends Controller
         return 'SUCCESS';
     }
 
+    public function getReturn()
+    {
+        $tradeNoOut = input('get.TradeNum/s');
+        if (empty($tradeNoOut))
+            return '<h1 style="text-align: center;padding-top: 10rem;">无效订单ID</h1>';
+        $returnUrl = buildReturnOrderUrl($tradeNoOut);
+        if (empty($returnUrl))
+            return '<h1 style="text-align: center;padding-top: 10rem;">订单尚未支付</h1>';
+        return redirect($returnUrl, [], 302);
+    }
+
     public function getSettleNotify()
     {
         $responseCode = input('get.RespCode/s');
@@ -105,9 +116,9 @@ class EebApiV1 extends Controller
         $updateSettle = Db::name('settle')
             ->where('settleNo=:settleNo', ['settleNo' => $settleNo])
             ->where('settleAisle', 5)->limit(1)->update([
-            'updateTime' => getDateTime(),
-            'status'     => $status
-        ]);
+                'updateTime' => getDateTime(),
+                'status'     => $status
+            ]);
 
         if ($updateSettle)
             return 'SUCCESS';

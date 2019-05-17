@@ -25,7 +25,7 @@ class Test extends Command
     {
         $model = new EebPayV1Model();
         //支付宝支付
-        dump($model->getPayUrl('1000000000','0.01','alipay','http://192.168.1.204:9001/OnLinePayNotifyUrl.php'));
+        dump($model->getPayUrl('300000000000','100','alipay','http://192.168.1.204:9001/OnLinePayNotifyUrl.php'));
         // 指令输出
     }
 }

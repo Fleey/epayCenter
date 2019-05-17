@@ -125,7 +125,8 @@ class PayModel
                 }
                 $payType       = 'alipay' . (request()->isMobile() ? 'wap' : '');
                 $requestResult = $eebPayModel->getPayUrl($tradeNo, $money, $payType,
-                    url('/Pay/Eeb/Notify', '', false, true));
+                    url('/Pay/Eeb/Notify', '', false, true),
+                    url('/Pay/Eeb/Return', '', false, true));
             }
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';

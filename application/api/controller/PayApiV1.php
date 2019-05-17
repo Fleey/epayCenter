@@ -180,17 +180,13 @@ class PayApiV1 extends Controller
 
         $requestData = PayModel::buildPayData($result, number_format($money / 100, 2), $payType, $payAisle);
         //核心业务
-
         if (!$requestData['isSuccess']) {
             Db::name('order')->where('id', $result)->limit(1)->delete();
             $this->returnJson(['status' => -1, 'msg' => '[EpayCenter]' . $requestData['msg']]);
             //订单创建失败回滚
         }
 
-        $isHtml = false;
-        if (!empty($requestData['isHtml']))
-            if ($requestData['isHtml'])
-                $isHtml = true;
+        $isHtml = empty($returnData['url']);
 
         $returnData = [
             'isHtml' => $isHtml
