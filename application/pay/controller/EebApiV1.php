@@ -8,6 +8,7 @@ use think\Db;
 
 class EebApiV1 extends Controller
 {
+
     /**
      * @return string
      * @throws \think\Exception
@@ -64,5 +65,52 @@ class EebApiV1 extends Controller
         processOrder($tradeNoOut);
 
         return 'SUCCESS';
+    }
+
+    public function getSettleNotify()
+    {
+        $responseCode = input('get.RespCode/s');
+        $status       = input('get.Status/s');
+        $settleNoOut  = input('get.TradeNum/s');
+        $settleNo     = input('get.OrderNum/s');
+        $signType     = input('get.SignType/s');
+        $sign         = input('get.Sign/s');
+
+        if (empty($responseCode) || empty($status) || empty($settleNo) || empty($settleNoOut) || empty($signType) || empty($sign))
+            return 'FAIL 请求参数有误';
+        if ($signType != 'MD5')
+            return 'FAIL 签名方式有误';
+        if ($responseCode != '1111')
+            return 'FAIL 请求状态有误';
+        $ebbPayModel = new EebPayV1Model();
+        $verifySign  = $ebbPayModel->buildSignMD5(input('get.'));
+        if ($verifySign != $sign)
+            return 'FAIL 签名有误';
+
+        switch ($status) {
+            case '01':
+                $status = 2;
+                break;
+            case '02':
+                $status = 1;
+                break;
+            case '03':
+                $status = 3;
+                break;
+            default:
+                $status = 1;
+                break;
+        }
+
+        $updateSettle = Db::name('settle')
+            ->where('settleNo=:settleNo', ['settleNo' => $settleNo])
+            ->where('settleAisle', 5)->limit(1)->update([
+            'updateTime' => getDateTime(),
+            'status'     => $status
+        ]);
+
+        if ($updateSettle)
+            return 'SUCCESS';
+        return 'FAIL 更新状态异常';
     }
 }

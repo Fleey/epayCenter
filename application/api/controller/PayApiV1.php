@@ -7,7 +7,7 @@ use think\App;
 use think\Controller;
 use think\Db;
 
-class ApiV1 extends Controller
+class PayApiV1 extends Controller
 {
     private $requestData = [];
     private $uid = 0;
@@ -41,12 +41,27 @@ class ApiV1 extends Controller
         $this->userKey     = $userKey;
     }
 
+    /**
+     * 获取支付接口列表
+     */
     public function postPayApiListAll()
     {
         $this->returnJson([
             'status' => 1,
             'msg'    => '查询接口列表成功',
-            'data'   => json_encode(PayModel::$apiList)
+            'data'   => json_encode(PayModel::apiList)
+        ]);
+    }
+
+    /**
+     * 获取银行代付列表
+     */
+    public function postBankListAll()
+    {
+        $this->returnJson([
+            'status' => 1,
+            'msg'    => '查询接口列表成功',
+            'data'   => json_encode(PayModel::bankList)
         ]);
     }
 
@@ -65,7 +80,7 @@ class ApiV1 extends Controller
         $this->returnJson([
             'status' => 1,
             'msg'    => '查询接口列表成功',
-            'data'   => json_encode(empty(PayModel::$apiList[$payType]) ? [] : PayModel::$apiList[$payType])
+            'data'   => json_encode(empty(PayModel::apiList[$payType]) ? [] : PayModel::apiList[$payType])
         ]);
     }
 

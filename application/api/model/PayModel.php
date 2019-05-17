@@ -4,41 +4,43 @@ namespace app\api\model;
 
 class PayModel
 {
-    public static $apiList = [
+    const apiList = [
         [
-            [
-                'name'  => 'ow51pay',
-                'aisle' => 3
-            ],
-            [
-                'name'  => '元宝聚合支付',
-                'aisle' => 1
-            ]
+            ['name' => 'ow51pay', 'aisle' => 3],
+            ['name' => '元宝聚合支付', 'aisle' => 1]
             //微信支付
         ], [
-
             //QQ钱包支付
         ], [
-            [
-                'name'  => 'ow51pay',
-                'aisle' => 3
-            ],
-            [
-                'name'  => '现代聚合支付',
-                'aisle' => 4
-            ],
-            [
-                'name'  => 'EEB原声聚合支付',
-                'aisle' => 5
-            ]
+            ['name' => 'ow51pay', 'aisle' => 3],
+            ['name' => '现代聚合支付', 'aisle' => 4],
+            ['name' => 'EEB原声聚合支付', 'aisle' => 5]
             //支付宝支付
         ], [
-            [
-                'name'  => 'XTXA快捷支付',
-                'aisle' => 2
-            ]
+            ['name' => 'XTXA快捷支付', 'aisle' => 2]
             //银联支付
         ]
+    ];
+
+    const bankList = [
+        ['name' => '工商银行', 'code' => 'ICBC'],
+        ['name' => '农业银行', 'code' => 'ABC'],
+        ['name' => '建设银行', 'code' => 'CCB'],
+        ['name' => '交通银行', 'code' => 'BOCO'],
+        ['name' => '中国银行', 'code' => 'BOC'],
+        ['name' => '招商银行', 'code' => 'CMBCHINA'],
+        ['name' => '兴业银行', 'code' => 'CIB'],
+        ['name' => '光大银行', 'code' => 'CEB'],
+        ['name' => '民生银行', 'code' => 'CMBC'],
+        ['name' => '浦发银行', 'code' => 'SPDB'],
+        ['name' => '广发银行', 'code' => 'GDB'],
+        ['name' => '邮政储蓄银行', 'code' => 'POST'],
+        ['name' => '中信银行', 'code' => 'ECITIC'],
+        ['name' => '华夏银行', 'code' => 'HXB'],
+        ['name' => '平安银行', 'code' => 'PINGANBANK'],
+        ['name' => '杭州银行', 'code' => 'HCCB'],
+        ['name' => '上海银行', 'code' => 'SHRCB'],
+        ['name' => '北京银行', 'code' => 'BOB']
     ];
 
     /**
@@ -50,9 +52,9 @@ class PayModel
     public static function isExistPayApi(int $payType, int $payAisle)
     {
         $payType = $payType - 1;
-        if (empty(self::$apiList[$payType]))
+        if (empty(self::apiList[$payType]))
             return false;
-        foreach (self::$apiList[$payType] as $data) {
+        foreach (self::apiList[$payType] as $data) {
             if ($data['aisle'] == $payAisle)
                 return true;
         }

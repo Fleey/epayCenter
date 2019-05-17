@@ -289,7 +289,7 @@ function buildReturnOrderUrl($id)
         'tradeNoOut'  => $orderInfo[0]['tradeNoOut'],
         'money'       => $orderInfo[0]['money'] / 100,
         'tradeStatus' => $orderInfo[0]['status'] ? 'SUCCESS' : 'FAIL',
-        'payType'     => \app\api\controller\ApiV1::converPayName($orderInfo[0]['payType'], true),
+        'payType'     => \app\api\controller\PayApiV1::converPayName($orderInfo[0]['payType'], true),
         'endTime'     => $orderInfo[0]['endTime']
     ];
 

@@ -10,7 +10,8 @@
 // +----------------------------------------------------------------------
 
 Route::group('api', function () {
-    Route::controller('v1', 'api/ApiV1');
+    Route::controller('v1/admin', 'api/AdminApiV1');
+    Route::controller('v1', 'api/PayApiV1');
 });
 Route::group('Pay', function () {
     Route::controller('Yb', 'pay/YbApiV1');
@@ -18,4 +19,10 @@ Route::group('Pay', function () {
     Route::controller('Ow', 'pay/OwApiV1');
     Route::controller('Xd', 'pay/XdApiV1');
     Route::controller('Eeb', 'pay/EebApiV1');
+});
+Route::rule('test', function () {
+    $password = '123456';
+    $randChat = getRandChar(6);
+    dump($randChat);
+    dump(hash('sha256', hash('sha256', $password) . $randChat));
 });
