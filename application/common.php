@@ -22,13 +22,15 @@ function curl($url = '', $addHeaders = [], $requestType = 'get', $requestData = 
     if ($requestType == 'get' && is_array($requestData)) {
         $tempBuff = '';
         foreach ($requestData as $key => $value) {
-            $tempBuff .= $key . '=' . $value . '&';
+            if ($urlencode)
+                $tempBuff .= rawurlencode(rawurlencode($key)) . '=' . rawurlencode(rawurlencode($value)) . '&';
+            else
+                $tempBuff .= $key . '=' . $value . '&';
         }
         $tempBuff = trim($tempBuff, '&');
         $url      .= '?' . $tempBuff;
     }
     //手动build get请求参数
-
     if (!empty($addHeaders))
         $headers = array_merge($headers, $addHeaders);
 
@@ -43,10 +45,11 @@ function curl($url = '', $addHeaders = [], $requestType = 'get', $requestData = 
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     //设置允许302转跳
 
+//    $isProxy = true;
     if ($isProxy) {
         curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-        curl_setopt($ch, CURLOPT_PROXY, '116.255.172.156'); //代理服务器地址
-        curl_setopt($ch, CURLOPT_PROXYPORT, 16819); //代理服务器端口
+        curl_setopt($ch, CURLOPT_PROXY, '127.0.0.1'); //代理服务器地址
+        curl_setopt($ch, CURLOPT_PROXYPORT, 1080); //代理服务器端口
         //set proxy
     }
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
@@ -68,6 +71,7 @@ function curl($url = '', $addHeaders = [], $requestType = 'get', $requestData = 
             $temp = '';
             foreach ($requestData as $key => $value) {
                 if ($urlencode) {
+//                    $temp .= urlencode($key) . '=' . urlencode($value) . '&';
                     $temp .= rawurlencode(rawurlencode($key)) . '=' . rawurlencode(rawurlencode($value)) . '&';
                 } else {
                     $temp .= $key . '=' . $value . '&';
@@ -285,7 +289,7 @@ function buildReturnOrderUrl($id)
         'tradeNoOut'  => $orderInfo[0]['tradeNoOut'],
         'money'       => $orderInfo[0]['money'] / 100,
         'tradeStatus' => $orderInfo[0]['status'] ? 'SUCCESS' : 'FAIL',
-        'payType'     => \app\api\controller\ApiV1::converPayName($orderInfo[0]['payType'],true),
+        'payType'     => \app\api\controller\ApiV1::converPayName($orderInfo[0]['payType'], true),
         'endTime'     => $orderInfo[0]['endTime']
     ];
 

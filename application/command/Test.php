@@ -2,6 +2,7 @@
 
 namespace app\command;
 
+use app\api\model\EebPayV1Model;
 use app\api\model\OwPayV1Model;
 use app\api\model\XdPayV1Model;
 use think\console\Command;
@@ -22,14 +23,9 @@ class Test extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $owPayModel = new XdPayV1Model();
-//        $requestData = $owPayModel->getPayUrlAliH5('1',
-//            100,
-//            url('/Pay/Xd/Notify', '', false, true),
-//            url('/Pay/Xd/Return', '', false, true));
-        $requestData = $owPayModel->isPay('1', '100');
+        $model = new EebPayV1Model();
         //支付宝支付
-        dump($requestData);
+        dump($model->getPayUrl('1000000000','0.01','alipay','http://192.168.1.204:9001/OnLinePayNotifyUrl.php'));
         // 指令输出
     }
 }

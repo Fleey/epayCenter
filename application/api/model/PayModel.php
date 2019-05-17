@@ -26,6 +26,10 @@ class PayModel
             [
                 'name'  => '现代聚合支付',
                 'aisle' => 4
+            ],
+            [
+                'name'  => 'EEB原声聚合支付',
+                'aisle' => 5
             ]
             //支付宝支付
         ], [
@@ -102,13 +106,24 @@ class PayModel
         } else if ($payAisle == 4) {
             $xdPayModel = new XdPayV1Model();
             if ($payType == 3) {
-                if (intval($money < 100)) {
+                if (intval($money) < 100) {
                     $requestResult['msg'] = '[XD] 订单金额不能低于 100 RMB';
                     return $requestResult;
                 }
                 $requestResult = $xdPayModel->getPayUrlAliH5($tradeNo, $money * 100,
                     url('/Pay/Xd/Notify', '', false, true),
                     url('/Pay/Xd/Return', '', false, true));
+            }
+        } else if ($payAisle == 5) {
+            $eebPayModel = new EebPayV1Model();
+            if ($payType == 3) {
+                if (intval($money) < 100) {
+                    $requestResult['msg'] = '[Eeb] 订单金额不能低于 100 RMB';
+                    return $requestResult;
+                }
+                $payType       = 'alipay' . (request()->isMobile() ? 'wap' : '');
+                $requestResult = $eebPayModel->getPayUrl($tradeNo, $money, $payType,
+                    url('/Pay/Eeb/Notify', '', false, true));
             }
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';

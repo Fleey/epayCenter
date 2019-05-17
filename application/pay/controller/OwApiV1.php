@@ -3,7 +3,6 @@
 namespace app\pay\controller;
 
 use app\api\model\OwPayV1Model;
-use think\App;
 use think\Controller;
 use think\Db;
 

@@ -163,7 +163,7 @@ class ApiV1 extends Controller
         if (!$result)
             $this->returnJson(['status' => -1, 'msg' => '[EpayCenter]数据库新增数据异常，请刷新重试。']);
 
-        $requestData = PayModel::buildPayData($tradeNo, number_format($money / 100, 2), $payType, $payAisle);
+        $requestData = PayModel::buildPayData($result, number_format($money / 100, 2), $payType, $payAisle);
         //核心业务
 
         if (!$requestData['isSuccess']) {
