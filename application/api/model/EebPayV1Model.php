@@ -41,7 +41,7 @@ class EebPayV1Model
             'NotifyUrl' => $notifyUrl,
             'TransTime' => date('YmdHis', time()),
             'PayType'   => $payType,
-            'IsImgCode' => '1',
+//            'IsImgCode' => '1',
             'UserIP'    => '127.0.0.1',
             'SignType'  => 'MD5'
         ];
@@ -50,26 +50,26 @@ class EebPayV1Model
 
         $param['Sign'] = $this->buildSignMD5($param);
         //build sign
-//        return ['isSuccess' => true, 'url' => $requestUrl . '?' . createLinkString($param, true)];
+        return ['isSuccess' => true, 'url' => $requestUrl . '?' . createLinkString($param, true)];
 
-        $requestResult = curl($requestUrl, [], 'post', $param, '', false);
-        if ($requestResult === false)
-            return ['isSuccess' => false, 'msg' => '[EebPay] Request Pay Url error 10001'];
-        $requestResult = json_decode($requestResult, true);
-        if ($requestResult['RespCode'] != '1111') {
-            if (!empty($requestResult['Message']))
-                trace('[EebPay]' . $requestResult['Message'], 'info');
-            return ['isSuccess' => false, 'msg' => '[EebPay] get pay url error pls connect web admin'];
-        }
-
-        $verifySign = $this->buildSignMD5($requestResult);
-        if ($verifySign != $requestResult['Sign'])
-            return ['isSuccess' => false, 'msg' => '[EebPay] Return param verify sign error'];
-        //verify return data
-        if (empty($requestResult['PayUrl']))
-            return ['isSuccess' => false, 'msg' => '[EebPay] PayUrl is empty ,pls connect web admin'];
-
-        return ['isSuccess' => true, 'html' => $requestResult['PayUrl'], 'isHtml' => true];
+//        $requestResult = curl($requestUrl, [], 'post', $param, '', false);
+//        if ($requestResult === false)
+//            return ['isSuccess' => false, 'msg' => '[EebPay] Request Pay Url error 10001'];
+//        $requestResult = json_decode($requestResult, true);
+//        if ($requestResult['RespCode'] != '1111') {
+//            if (!empty($requestResult['Message']))
+//                trace('[EebPay]' . $requestResult['Message'], 'info');
+//            return ['isSuccess' => false, 'msg' => '[EebPay] get pay url error pls connect web admin'];
+//        }
+//
+//        $verifySign = $this->buildSignMD5($requestResult);
+//        if ($verifySign != $requestResult['Sign'])
+//            return ['isSuccess' => false, 'msg' => '[EebPay] Return param verify sign error'];
+//        //verify return data
+//        if (empty($requestResult['PayUrl']))
+//            return ['isSuccess' => false, 'msg' => '[EebPay] PayUrl is empty ,pls connect web admin'];
+//
+//        return ['isSuccess' => true, 'url' => urldecode($requestResult['PayUrl'])];
     }
 
     /**

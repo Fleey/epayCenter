@@ -191,7 +191,7 @@ class PayApiV1 extends Controller
         $returnData = [
             'isHtml' => $isHtml
         ];
-        if (!$isHtml)
+        if ($isHtml)
             $returnData['url'] = $requestData['url'];
         else
             $returnData['html'] = $requestData['html'];
