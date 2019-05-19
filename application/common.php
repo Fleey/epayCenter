@@ -307,3 +307,14 @@ function getDateTime()
 {
     return date('Y-m-d H:i:s', time());
 }
+
+
+function strToUTF8($strText)
+{
+    $encode = mb_detect_encoding($strText, array('UTF-8', 'GB2312', 'GBK'));
+    if ($encode == 'EUC-CN') {
+        return @iconv('GB2312', 'UTF-8', $strText);
+    } else {
+        return $strText;
+    }
+}

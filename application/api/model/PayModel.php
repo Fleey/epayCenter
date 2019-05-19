@@ -14,7 +14,8 @@ class PayModel
         ], [
             ['name' => 'ow51pay', 'aisle' => 3],
             ['name' => '现代聚合支付', 'aisle' => 4],
-            ['name' => 'EEB原声聚合支付', 'aisle' => 5]
+            ['name' => 'EEB原声聚合支付', 'aisle' => 5],
+            ['name' => 'Tw天网聚合支付', 'aisle' => 6]
             //支付宝支付
         ], [
             ['name' => 'XTXA快捷支付', 'aisle' => 2]
@@ -127,6 +128,17 @@ class PayModel
                 $requestResult = $eebPayModel->getPayUrl($tradeNo, $money, $payType,
                     url('/Pay/Eeb/Notify', '', false, true),
                     url('/Pay/Eeb/Return', '', false, true));
+            }
+        } else if ($payAisle == 6) {
+            $twPayModel = new TwPayV1Model();
+            if ($payType == 3) {
+                if (intval($money) < 200) {
+                    $requestResult['msg'] = '[Tw] 订单金额不能低于 200 RMB';
+                    return $requestResult;
+                }
+                $requestResult = $twPayModel->getPayUrl($tradeNo, $money, 'alipay',
+                    url('/Pay/Tw/Notify', '', false, true),
+                    url('/Pay/Tw/Return', '', false, true));
             }
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';

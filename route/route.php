@@ -19,6 +19,7 @@ Route::group('Pay', function () {
     Route::controller('Ow', 'pay/OwApiV1');
     Route::controller('Xd', 'pay/XdApiV1');
     Route::controller('Eeb', 'pay/EebApiV1');
+    Route::controller('Tw', 'pay/TwApiV1');
 });
 Route::rule('test', function () {
     $password = '123456';
