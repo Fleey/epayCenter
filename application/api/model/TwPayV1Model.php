@@ -76,6 +76,10 @@ class TwPayV1Model
             if ($isMobile)
                 return 1006;
             return 1003;
+        } else if ($type == 'bankpay') {
+            if ($isMobile)
+                return 1005;
+            return 2000;
         }
         return 0000;
     }

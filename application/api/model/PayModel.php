@@ -18,7 +18,8 @@ class PayModel
             ['name' => 'Tw天网聚合支付', 'aisle' => 6]
             //支付宝支付
         ], [
-            ['name' => 'XTXA快捷支付', 'aisle' => 2]
+            ['name' => 'XTXA快捷支付', 'aisle' => 2],
+            ['name' => 'Tw天网聚合支付', 'aisle' => 6]
             //银联支付
         ]
     ];
@@ -131,15 +132,20 @@ class PayModel
             }
         } else if ($payAisle == 6) {
             $twPayModel = new TwPayV1Model();
-            if ($payType == 3) {
-                if (intval($money) < 200) {
-                    $requestResult['msg'] = '[Tw] 订单金额不能低于 200 RMB';
-                    return $requestResult;
-                }
-                $requestResult = $twPayModel->getPayUrl($tradeNo, $money, 'alipay',
-                    url('/Pay/Tw/Notify', '', false, true),
-                    url('/Pay/Tw/Return', '', false, true));
+            $payName = 'none';
+            if (intval($money) < 200) {
+                $requestResult['msg'] = '[Tw] 订单金额不能低于 200 RMB';
+                return $requestResult;
             }
+            if ($payType == 3) {
+                $payName = 'alipay';
+            }else if($payType ==4){
+                $payName = 'bankpay';
+            }
+
+            $requestResult = $twPayModel->getPayUrl($tradeNo, $money, $payName,
+                url('/Pay/Tw/Notify', '', false, true),
+                url('/Pay/Tw/Return', '', false, true));
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';
         }
