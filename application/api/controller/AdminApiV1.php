@@ -2,18 +2,37 @@
 
 namespace app\api\controller;
 
-use app\api\model\PayModel;
 use think\App;
 use think\Controller;
 use think\Db;
 
 class AdminApiV1 extends Controller
 {
+    private $whiteList = [
+        'api/v1/admin/token'
+    ];
+
+    private $uid = 0;
+    private $token = '';
+
     public function __construct(App $app = null)
     {
         parent::__construct($app);
 
-        dump($this->request);
+        $requestPath       = strtolower($this->request->path());
+        $requestPathLength = strlen($requestPath);
+        if ($requestPath[$requestPathLength - 1] == '/')
+            $requestPath = substr($requestPath, 0, $requestPathLength - 1);
+        //标准化请求路径
+        if (!in_array($requestPath, $this->whiteList)) {
+            $this->uid   = input('post.uid/d', 0);
+            $this->token = input('post.token/s', '');
+            if (!$this->verifyToken($this->uid, $this->token))
+                exit(json([
+                    'status' => 0,
+                    'msg'    => 'token已经失效,请重新登录或获取'
+                ])->send());
+        }
     }
 
     /**
@@ -47,9 +66,28 @@ class AdminApiV1 extends Controller
         return json(['status' => 1, 'token' => $token, 'uid' => $selectResult[0]['id'], 'expire' => $expireTime]);
     }
 
+    /**
+     * 注销登录函数
+     * @return \think\response\Json
+     */
     public function postDeleteToken()
     {
-//        $uid = input()
+        $uid   = input('post.uid/s');
+        $token = input('post.token/s');
+
+        $tokenData = cache('admin_token_' . $uid);
+
+        do {
+            if (empty($tokenData))
+                break;
+            if (strlen($token) != 64)
+                break;
+            if ($token != $tokenData)
+                break;
+            cache('admin_token_' . $uid, null);
+        } while (false);
+        //注销token
+        return json(['status' => 1, 'msg' => '已经注销成功']);
     }
 
     /**
