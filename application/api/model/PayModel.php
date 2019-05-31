@@ -7,7 +7,8 @@ class PayModel
     const apiList = [
         [
             ['name' => 'ow51pay', 'aisle' => 3],
-            ['name' => '元宝聚合支付', 'aisle' => 1]
+            ['name' => '元宝聚合支付', 'aisle' => 1],
+            ['name' => 'Hook支付', 'aisle' => 7]
             //微信支付
         ], [
             //QQ钱包支付
@@ -81,7 +82,8 @@ class PayModel
             $productName = env('DEFAULT_PRODUCT_NAME');
 
         $requestResult = [
-            'isSuccess' => false
+            'isSuccess' => false,
+            'msg'       => '不知道什么地方错误了，请联系管理员'
         ];
 
         if ($payAisle == 1) {
@@ -132,20 +134,24 @@ class PayModel
             }
         } else if ($payAisle == 6) {
             $twPayModel = new TwPayV1Model();
-            $payName = 'none';
+            $payName    = 'none';
             if (intval($money) < 200) {
                 $requestResult['msg'] = '[Tw] 订单金额不能低于 200 RMB';
                 return $requestResult;
             }
             if ($payType == 3) {
                 $payName = 'alipay';
-            }else if($payType ==4){
+            } else if ($payType == 4) {
                 $payName = 'bankpay';
             }
 
             $requestResult = $twPayModel->getPayUrl($tradeNo, $money, $payName,
                 url('/Pay/Tw/Notify', '', false, true),
                 url('/Pay/Tw/Return', '', false, true));
+        } else if ($payAisle == 7) {
+            $time = time();
+            $sign = md5($tradeNo . $time . 'huaji233');
+            return ['isSuccess' => true, 'url' => url('/Pay/Hk/WeChatPay?orderID=' . $tradeNo . '&time=' . $time . '&sign=' . $sign, '', false, true)];
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';
         }

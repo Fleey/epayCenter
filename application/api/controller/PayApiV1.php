@@ -186,15 +186,15 @@ class PayApiV1 extends Controller
             //订单创建失败回滚
         }
 
-        $isHtml = empty($returnData['url']);
+        $isHtml = empty($requestData['url']);
 
         $returnData = [
             'isHtml' => $isHtml
         ];
         if ($isHtml)
-            $returnData['url'] = $requestData['url'];
-        else
             $returnData['html'] = $requestData['html'];
+        else
+            $returnData['url'] = $requestData['url'];
         //为了解决那些sb玩意 居然tm直接返回html操蛋
         $this->returnJson(['status' => 1, 'msg' => '[EpayCenter]创建订单成功', 'data' => json_encode($returnData)]);
     }

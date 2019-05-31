@@ -10,6 +10,7 @@
 // +----------------------------------------------------------------------
 
 Route::group('api', function () {
+    Route::controller('v1/hook', 'api/HookApiV1');
     Route::controller('v1/admin', 'api/AdminApiV1');
     Route::controller('v1', 'api/PayApiV1');
 });
@@ -20,6 +21,7 @@ Route::group('Pay', function () {
     Route::controller('Xd', 'pay/XdApiV1');
     Route::controller('Eeb', 'pay/EebApiV1');
     Route::controller('Tw', 'pay/TwApiV1');
+    Route::controller('Hk', 'pay/HkApiV1');
 });
 Route::rule('test', function () {
     $password = '123456';
