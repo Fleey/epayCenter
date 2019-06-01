@@ -83,10 +83,11 @@ class HookApiV1 extends Controller
             'status'  => 2
         ]);
 
-        if ($updateResult)
-            $this->returnJson(['status' => 1, 'msg' => 'notify success']);
+        if (!$updateResult)
+            $this->returnJson(['status' => 0, 'msg' => 'change order data fail']);
 
-        $this->returnJson(['status' => 0, 'msg' => 'change order data fail']);
+        $this->returnJson(['status' => 1, 'msg' => 'notify success']);
+
     }
 
     public function postErrorNotify()
@@ -135,15 +136,29 @@ class HookApiV1 extends Controller
             'status' => 3
         ]);
 
-        if ($updateResult)
+        if (!$updateResult)
             $this->returnJson([
-                'status' => 1,
-                'msg'    => 'notify success'
+                'status' => 0,
+                'msg'    => 'change order status fail'
             ]);
+        $orderInfo = Db::name('hook_order')->where([
+            'hid'     => $hid,
+            'randStr' => $randStr
+        ])->field('tradeNoOut')->limit(1)->select();
+        if (empty($orderInfo)) {
+            trace('回调异常 hid => ' . $hid . ' randStr => ' . $randStr);
+        } else {
+            $tradeNoOut  = $orderInfo[0]['tradeNoOut'];
+            $updateOrder = Db::name('order')->where('id', $tradeNoOut)->limit(1)->update([
+                'endTime' => getDateTime(),
+                'status'  => 1
+            ]);
+            processOrder($tradeNoOut);
+        }
         //change order status
         $this->returnJson([
-            'status' => 0,
-            'msg'    => 'change order status fail'
+            'status' => 1,
+            'msg'    => 'notify success'
         ]);
     }
 

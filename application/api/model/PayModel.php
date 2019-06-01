@@ -2,6 +2,8 @@
 
 namespace app\api\model;
 
+use think\Db;
+
 class PayModel
 {
     const apiList = [
@@ -149,8 +151,19 @@ class PayModel
                 url('/Pay/Tw/Notify', '', false, true),
                 url('/Pay/Tw/Return', '', false, true));
         } else if ($payAisle == 7) {
-            $time = time();
-            $sign = md5($tradeNo . $time . 'huaji233');
+            $time       = time();
+            $sign       = md5($tradeNo . $time . 'huaji233');
+            $insertData = Db::name('hook_order')->insert([
+                'hid'        => 1,
+                'tradeNoOut' => $tradeNo,
+                'money'      => $money * 100,
+                'randStr'    => md5($time . uniqid()),
+                'type'       => 1,
+                'status'     => 0,
+                'createTime' => getDateTime()
+            ]);
+            if (!$insertData)
+                return ['isSuccess' => false, 'msg' => '[HookPay] 生成订单失败 请联系管理员'];
             return ['isSuccess' => true, 'url' => url('/Pay/Hk/WeChatPay?orderID=' . $tradeNo . '&time=' . $time . '&sign=' . $sign, '', false, true)];
         } else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';
