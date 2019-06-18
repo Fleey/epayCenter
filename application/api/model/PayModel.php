@@ -167,6 +167,10 @@ class PayModel
                 return ['isSuccess' => false, 'msg' => '[HookPay] 生成订单失败 请联系管理员'];
             return ['isSuccess' => true, 'url' => url('/Pay/Hk/WeChatPay?orderID=' . $tradeNo . '&time=' . $time . '&sign=' . $sign, '', false, true)];
         } else if($payAisle == 8){
+            if (intval($money) < 1) {
+                $requestResult['msg'] = '[Kyx] 订单金额不能低于 1 RMB';
+                return $requestResult;
+            }
             $kyxPayModel = new KyxV1Model();
             $requestResult = $kyxPayModel->getPayUrl($tradeNo,$money,$productName,
                 url('/Pay/Kyx/Notify','',false,true),
