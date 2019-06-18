@@ -318,3 +318,18 @@ function strToUTF8($strText)
         return $strText;
     }
 }
+
+/**
+ * xml转换成数组
+ * @param $xml
+ * @return array|mixed|object
+ */
+function xmlToArray(string $xml)
+{
+    try {
+        libxml_disable_entity_loader(true);
+        return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+    } catch (Exception $exception) {
+        return null;
+    }
+}

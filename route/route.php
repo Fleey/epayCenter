@@ -9,6 +9,8 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+use app\api\model\KyxV1Model;
+
 Route::group('api', function () {
     Route::controller('v1/hook', 'api/HookApiV1');
     Route::controller('v1/admin', 'api/AdminApiV1');
@@ -22,10 +24,8 @@ Route::group('Pay', function () {
     Route::controller('Eeb', 'pay/EebApiV1');
     Route::controller('Tw', 'pay/TwApiV1');
     Route::controller('Hk', 'pay/HkApiV1');
+    Route::controller('Kyx','pay/KyxApiV1');
 });
 Route::rule('test', function () {
-    $password = '123456';
-    $randChat = getRandChar(6);
-    dump($randChat);
-    dump(hash('sha256', hash('sha256', $password) . $randChat));
+    dump('3333');
 });

@@ -525,7 +525,12 @@ abstract class Connection
                 $startTime = microtime(true);
             }
 
-            $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $params);
+            try {
+                $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $params);
+            } catch (\Exception $e) {
+                $this->log('[尝试重连]这里尝试重连了。。。');
+                $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $params);
+            }
 
             if ($config['debug']) {
                 // 记录数据库连接信息

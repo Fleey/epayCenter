@@ -18,7 +18,8 @@ class PayModel
             ['name' => 'ow51pay', 'aisle' => 3],
             ['name' => '现代聚合支付', 'aisle' => 4],
             ['name' => 'EEB原声聚合支付', 'aisle' => 5],
-            ['name' => 'Tw天网聚合支付', 'aisle' => 6]
+            ['name' => 'Tw天网聚合支付', 'aisle' => 6],
+            ['name'=>'KYX卡易信聚合支付','aisle'=>8]
             //支付宝支付
         ], [
             ['name' => 'XTXA快捷支付', 'aisle' => 2],
@@ -165,7 +166,13 @@ class PayModel
             if (!$insertData)
                 return ['isSuccess' => false, 'msg' => '[HookPay] 生成订单失败 请联系管理员'];
             return ['isSuccess' => true, 'url' => url('/Pay/Hk/WeChatPay?orderID=' . $tradeNo . '&time=' . $time . '&sign=' . $sign, '', false, true)];
-        } else {
+        } else if($payAisle == 8){
+            $kyxPayModel = new KyxV1Model();
+            $requestResult = $kyxPayModel->getPayUrl($tradeNo,$money,$productName,
+                url('/Pay/Kyx/Notify','',false,true),
+                url('/Pay/Kyx/Return','',false,true)
+                );
+        }else {
             $requestResult['msg'] = '[EpayCenter] 支付类型接口不存在';
         }
         return $requestResult;

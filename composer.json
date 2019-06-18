@@ -21,7 +21,8 @@
       "ext-curl": "*",
       "ext-json": "*",
       "ext-mbstring": "*",
-      "ext-iconv": "*"
+      "ext-iconv": "*",
+      "ext-libxml": "*"
     },
     "autoload": {
         "psr-4": {
