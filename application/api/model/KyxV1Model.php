@@ -47,7 +47,8 @@ class KyxV1Model
         $param['sign_type'] = 'MD5';
 
         $requestResult = curl($requestUrl, [
-            'Referer:'.$requestDomain
+            'Referer: '.$requestDomain,
+            'User-Agent: '.Request::header('user-agent')
         ], 'post', $param, '', false);
         return ['isSuccess'=>true,'html'=>$requestResult];
     }
