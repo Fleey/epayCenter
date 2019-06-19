@@ -25,6 +25,6 @@ Route::group('Pay', function () {
     Route::controller('Hk', 'pay/HkApiV1');
     Route::controller('Kyx','pay/KyxApiV1');
 });
-Route::rule('test', function () {
-//    dump('3333');
+Route::rule('/', function () {
+    echo '<h1>尚未登录不能进行下一步操作</h1>';
 });
