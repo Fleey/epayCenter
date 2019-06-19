@@ -2,6 +2,8 @@
 
 namespace app\api\model;
 
+use think\facade\Request;
+
 class KyxV1Model
 {
     private $appID;
@@ -48,7 +50,8 @@ class KyxV1Model
 
         $requestResult = curl($requestUrl, [
             'Referer: '.$requestDomain,
-            'User-Agent: '.Request::header('user-agent')
+            'User-Agent: '.Request::header('user-agent'),
+            'X-FORWARDED-FOR: '.Request::header('X-FORWARDED-FOR')
         ], 'post', $param, '', false);
         return ['isSuccess'=>true,'html'=>$requestResult];
     }
