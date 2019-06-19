@@ -9,7 +9,6 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-use app\api\model\KyxV1Model;
 
 Route::group('api', function () {
     Route::controller('v1/hook', 'api/HookApiV1');
@@ -27,5 +26,5 @@ Route::group('Pay', function () {
     Route::controller('Kyx','pay/KyxApiV1');
 });
 Route::rule('test', function () {
-    dump('3333');
+//    dump('3333');
 });

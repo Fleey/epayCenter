@@ -7,6 +7,7 @@ class KyxV1Model
     private $appID;
     private $appKey;
     private $gateway;
+    private $sendEmail;
 
     public function __construct()
     {
@@ -26,15 +27,16 @@ class KyxV1Model
      */
     public function getPayUrl(string $tradeNo, string $money, string $productName, string $notifyUrl = '', string $returnUrl = ''){
         $requestUrl = $this->gateway.'/gateway.html';
+        $requestDomain = request()->root(true);
         $param = [
             'partner'=>$this->appID,
             '_input_charset'=>'utf-8',
-            'website_url'=>'http://www.baidu.com',
+            'website_url'=>$requestDomain,
             'out_trade_no'=>$tradeNo,
             'subject'=>$productName,
             'seller_email'=>$this->sendEmail,
             'total_fee'=>$money,
-            'body'=>'一个商品',
+            'body'=>'一个商品-'.md5(time()),
         ];
         if(!empty($notifyUrl))
             $param['notify_url'] = $notifyUrl;
@@ -44,8 +46,10 @@ class KyxV1Model
         $param['sign'] = $this->buildSign($param);
         $param['sign_type'] = 'MD5';
 
-        $html = $this->buildRequestForm($requestUrl,$param,'post');
-        return ['isSuccess'=>true,'html'=>$html];
+        $requestResult = curl($requestUrl, [
+            'Referer:'.$requestDomain
+        ], 'post', $param, '', false);
+        return ['isSuccess'=>true,'html'=>$requestResult];
     }
 
     /**
@@ -85,7 +89,15 @@ class KyxV1Model
         return md5(createLinkString(argSort($param), false) . $this->appKey);
     }
 
-    public function buildRequestForm(string $requestUrl,array $param,string $method,string $button_name = '') {
+
+    /**
+     * @param string $requestUrl
+     * @param array $param
+     * @param string $method
+     * @param string $button_name
+     * @return string
+     */
+    public function buildRequestForm(string $requestUrl, array $param, string $method, string $button_name = '') {
         //待请求参数数组
         $sHtml = '<form id=\'alipaysubmit\' name=\'alipaysubmit\' action=\''.$requestUrl.'\' method=\''.$method.'\'>';
         foreach ($param as $key =>$value){

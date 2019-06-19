@@ -27,7 +27,7 @@ class Test extends Command
     {
         $model = new KyxV1Model();
         //支付宝支付
-        dump($model->getPayUrl('1','1','defaultProductName','http://center.zmz999.com/nofity','http://center.zmz999.com/return'));
+        dump($model->getPayUrl('900000000009','1.00','defaultProductName','http://center.zmz999.com/nofity','http://center.zmz999.com/return'));
 //        dump($model->isPay('300000000001'));
         // 指令输出
     }
