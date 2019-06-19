@@ -152,17 +152,19 @@ class PayApiV1 extends Controller
             'tradeNoOut' => $tradeNo,
             'uid'        => $this->uid
         ])->limit(1)->field('id,status')->select();
-        if (!empty($result))
+        if (!empty($result)){
             if ($result[0]['status'])
                 $this->returnJson(['status' => 2, 'msg' => '[EpayCenter] 订单已经付款,无法再次支付']);
+            $this->returnJson(['status'=>0,'msg'=>'[EpayCenter] 订单已存在，请重新发起订单 或支付后再刷新本页面']);
+        }
 
         if (!PayModel::isExistPayApi($payType, $payAisle))
-            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 2支付类型接口有误,请联系管理员处理']);
-        Db::name('order')->where([
-            'tradeNoOut' => $tradeNo,
-            'uid'        => $this->uid
-        ])->limit(1)->delete();
-
+            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型接口有误,请联系管理员处理']);
+//        Db::name('order')->where([
+//            'tradeNoOut' => $tradeNo,
+//            'uid'        => $this->uid
+//        ])->limit(1)->delete();
+        //不知道当时为毛要delete
 
         $result = Db::name('order')->insertGetId([
             'uid'        => $this->uid,
