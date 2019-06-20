@@ -269,8 +269,26 @@ function processOrder($id)
     $data['sign_type'] = 'MD5';
 
     $requestResult = curl($orderInfo[0]['notify_url'], [], 'post', $data, '', false);
+    $isCron        = false;
     if ($requestResult === false)
-        trace('日志信息: 请求结果 => ' . $requestResult . ' 请求id =>' . $id . ' 请求数据 => ' . json_encode($data), 'info');
+        $isCron = true;
+    else {
+        $requestResult = json_decode($requestResult, true);
+        if ($requestResult == null)
+            $isCron = true;
+        else {
+            if ($requestResult['status'] != 1)
+                $isCron = true;
+        }
+    }
+    if ($isCron)
+        \think\Db::name('cron')->insert([
+            'url'        => $orderInfo[0]['notify_url'],
+            'method'     => 'post',
+            'data'       => json_encode($data),
+            'status'     => 0,
+            'createTime' => getDateTime()
+        ]);
     //回调事件
 }
 
