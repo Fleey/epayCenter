@@ -39,6 +39,8 @@ class KyxV1Model
             'seller_email'=>$this->sendEmail,
             'total_fee'=>$money,
             'body'=>'一个商品-'.md5(time()),
+            'service'=>'alipay.pc'
+            //'service'=>'alipay.'.(Request::isMobile()?'wap':'pc')
         ];
         if(!empty($notifyUrl))
             $param['notify_url'] = $notifyUrl;
@@ -67,7 +69,8 @@ class KyxV1Model
         $param              = [
             'partner'        => $this->appID,
             '_input_charset' => 'utf-8',
-            'out_trade_no'   => $tradeNo
+            'out_trade_no'   => $tradeNo,
+            'service'=> 'alipay.pc'
         ];
         $param['sign']      = $this->buildSign($param);
         $param['sign_type'] = 'MD5';
