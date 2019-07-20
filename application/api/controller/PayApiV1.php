@@ -151,38 +151,35 @@ class PayApiV1 extends Controller
         $result = Db::name('order')->where([
             'tradeNoOut' => $tradeNo,
             'uid'        => $this->uid
-        ])->limit(1)->field('id,status')->select();
-        if (!empty($result)){
+        ])->limit(1)->field('id,status,money')->select();
+        if (!empty($result)) {
             if ($result[0]['status'])
                 $this->returnJson(['status' => 2, 'msg' => '[EpayCenter] 订单已经付款,无法再次支付']);
-            $this->returnJson(['status'=>0,'msg'=>'[EpayCenter] 订单已存在，请重新发起订单 或支付后再刷新本页面']);
+            if($money != $result[0]['money'])
+                $this->returnJson(['status'=>0,'msg'=>'[EpayCenter] 金额改变，请重新发起新的订单。']);
+            $result = $result[0]['id'];
+        }else{
+            if (!PayModel::isExistPayApi($payType, $payAisle))
+                $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型接口有误,请联系管理员处理']);
+
+            $result = Db::name('order')->insertGetId([
+                'uid'        => $this->uid,
+                'tradeNoOut' => $tradeNo,
+                'money'      => $money,
+                'notify_url' => $notifyUrl,
+                'return_url' => $returnUrl,
+                'payType'    => $payType,
+                'payAisle'   => $payAisle,
+                'status'     => 0,
+                'createTime' => getDateTime()
+            ]);
+            if (!$result)
+                $this->returnJson(['status' => -1, 'msg' => '[EpayCenter]数据库新增数据异常，请刷新重试。']);
         }
 
-        if (!PayModel::isExistPayApi($payType, $payAisle))
-            $this->returnJson(['status' => 0, 'msg' => '[EpayCenter] 支付类型接口有误,请联系管理员处理']);
-//        Db::name('order')->where([
-//            'tradeNoOut' => $tradeNo,
-//            'uid'        => $this->uid
-//        ])->limit(1)->delete();
-        //不知道当时为毛要delete
+        $productName = '自助购物-' . md5($tradeNo);
 
-        $result = Db::name('order')->insertGetId([
-            'uid'        => $this->uid,
-            'tradeNoOut' => $tradeNo,
-            'money'      => $money,
-            'notify_url' => $notifyUrl,
-            'return_url' => $returnUrl,
-            'payType'    => $payType,
-            'payAisle'   => $payAisle,
-            'status'     => 0,
-            'createTime' => getDateTime()
-        ]);
-        if (!$result)
-            $this->returnJson(['status' => -1, 'msg' => '[EpayCenter]数据库新增数据异常，请刷新重试。']);
-
-        $productName = '自助购物-'.uniqid();
-
-        $requestData = PayModel::buildPayData($result, number_format($money / 100, 2, '.', ''), $payType, $payAisle,$productName);
+        $requestData = PayModel::buildPayData($result, number_format($money / 100, 2, '.', ''), $payType, $payAisle, $productName);
         //核心业务
         if (!$requestData['isSuccess']) {
             Db::name('order')->where('id', $result)->limit(1)->delete();

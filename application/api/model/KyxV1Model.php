@@ -38,7 +38,7 @@ class KyxV1Model
             'subject'=>$productName,
             'seller_email'=>$this->sendEmail,
             'total_fee'=>$money,
-            'body'=>'一个商品-'.md5(time()),
+            'body'=>'一个商品-'.md5($tradeNo),
             'service'=>'alipay.pc'
             //'service'=>'alipay.'.(Request::isMobile()?'wap':'pc')
         ];

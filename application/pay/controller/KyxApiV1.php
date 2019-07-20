@@ -20,7 +20,7 @@ class KyxApiV1 extends Controller
         if (empty($sign) || empty($signType) || empty($tradeNoOut) || empty($tradeStatus) || empty($money))
             return '<h1 style="text-align: center;padding-top: 10rem;">参数无效</h1>';
 
-        if ($tradeStatus != 'TRADE_SUCCESS')
+        if ($tradeStatus != 'TRADE_SUCCESS' && $tradeStatus != 'TRADE_FINISHED')
             return '<h1 style="text-align: center;padding-top: 10rem;">订单尚未支付</h1>';
 
         $signParam = input('post.');
@@ -29,6 +29,17 @@ class KyxApiV1 extends Controller
         $kyxModel = new KyxV1Model();
         if ($kyxModel->buildSign($signParam) != $sign)
             return '<h1 style="text-align: center;padding-top: 10rem;">签名无效</h1>';
+
+        $updateOrder = Db::name('order')->where('id', $tradeNoOut)->limit(1)->update([
+            'endTime' => getDateTime(),
+            'status'  => 1
+        ]);
+
+        //更新订单状态
+        if (!$updateOrder) {
+            trace('[KyxApiV1] 更新订单失败 tradeNoOut => ' . $tradeNoOut, 'error');
+        }
+        processOrder($tradeNoOut);
 
         $returnUrl = buildReturnOrderUrl($tradeNoOut);
         if (empty($returnUrl))
@@ -48,7 +59,7 @@ class KyxApiV1 extends Controller
         if (empty($sign) || empty($signType) || empty($tradeNoOut) || empty($tradeStatus) || empty($money))
             return 'fail';
 
-        if ($tradeStatus != 'TRADE_SUCCESS')
+        if ($tradeStatus != 'TRADE_SUCCESS' && $tradeStatus != 'TRADE_FINISHED')
             return 'fail';
 
         $signParam = input('post.');
@@ -61,8 +72,8 @@ class KyxApiV1 extends Controller
         $orderData = Db::name('order')->where('id', $tradeNoOut)->field('status,payAisle,money')->limit(1)->select();
         if (empty($orderData))
             return 'out order fail';
-        if(!$kyxModel->isPay($tradeNoOut))
-            return 'trade unpaid fail';
+//        if(!$kyxModel->isPay($tradeNoOut))
+//            return 'trade unpaid fail';
         if ($orderData[0]['status'])
             return 'success';
         if ($orderData[0]['payAisle'] != 8)
